@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:version/version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:html/parser.dart' as parser;
+import 'package:http/http.dart' as http;
 
 void main() async {
   runApp(const MyApp());
@@ -59,29 +61,60 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
+Future<List<String>> extractData() async {
+  // Getting the response from the targeted url
+  final response = await http.Client().get(
+      Uri.parse('https://github.com/Kalpu-24/UTULogin/blob/main/README.md'));
+
+  // Status Code 200 means response has been received successfully
+  if (response.statusCode == 200) {
+    // Getting the html document from the response
+    var document = parser.parse(response.body);
+    try {
+      // Scraping the first article title
+      var responseString1 = document
+          .querySelectorAll("h2")[1]
+          .text
+          .trim()
+          .split(' ')[1]
+          .split('+')[0];
+      var responseString2 = document
+          .querySelectorAll("h2")[1]
+          .text
+          .trim()
+          .split(' ')[1]
+          .split('+')[1];
+
+      print(responseString1);
+      return [responseString1.toString(), responseString2.toString()];
+    } catch (e) {
+      return ['', 'ERROR!'];
+    }
+  } else {
+    return ['', 'ERROR: ${response.statusCode}.'];
+  }
+}
+
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    bool upavai = false;
+    // bool upavai = false;
     var appState = context.watch<MyAppState>();
-    appState.getVer().then((value) {
-      Version currentVersion = Version.parse(appState.data.elementAt(0));
-      Version latestVersion = Version.parse("0.0.2");
-      if (latestVersion > currentVersion) {
-        // ignore: avoid_print
-        upavai = true;
-      } else if (latestVersion == currentVersion) {
-        if (appState.data.elementAt(0) == "1") {
-          // ignore: avoid_print
-          print("This is a beta version");
-        } else {
-          // ignore: avoid_print
-          print("This is a stable version");
-        }
-      }
-    });
+    // Version currentVersion;
+
+    // appState.getVer().then((gvalue) async {
+    //   currentVersion = Version.parse(appState.data.elementAt(0));
+    //   await extractData().then((value) async {
+    //     Version latestVersion = Version.parse(value[0]);
+    //     if (latestVersion > currentVersion) {
+    //       // ignore: avoid_print
+    //       upavai = true;
+    //     } else if (latestVersion == currentVersion) {
+    //     } else {}
+    //   });
+    // });
 
     Widget Page;
     appState.check();
@@ -92,13 +125,28 @@ class MyHomePage extends StatelessWidget {
     }
     return Scaffold(
         appBar: AppBar(
-          title: const Text('UTU Login WebView'),
+          title: const Text('UTU Login'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: MaterialButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage2()),
+                    );
+                  },
+                  child: Text("SIS")),
+            )
+          ],
         ),
-        body: upavai
-            ? AlertDialog(
-                content: Text("yoooo"),
-              )
-            : Page,
+        body:
+            //upavai
+            //     ? AlertDialog(
+            //         content: Text("yoooo"),
+            //       )
+            //     :
+            Page,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             showDialog(
@@ -115,6 +163,124 @@ class MyHomePage extends StatelessWidget {
           tooltip: 'Configure',
           child: const Icon(Icons.settings),
         ));
+  }
+}
+
+class MyHomePage2 extends StatelessWidget {
+  const MyHomePage2({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // bool upavai = false;
+    var appState = context.watch<MyAppState>();
+    // Version currentVersion;
+
+    // appState.getVer().then((gvalue) async {
+    //   currentVersion = Version.parse(appState.data.elementAt(0));
+    //   await extractData().then((value) async {
+    //     Version latestVersion = Version.parse(value[0]);
+    //     if (latestVersion > currentVersion) {
+    //       // ignore: avoid_print
+    //       upavai = true;
+    //     } else if (latestVersion == currentVersion) {
+    //     } else {}
+    //   });
+    // });
+
+    Widget Page;
+    appState.check();
+    if (appState.saved) {
+      Page = Sis();
+    } else {
+      Page = const NoDataPage();
+    }
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('UTU Login'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: MaterialButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                    );
+                  },
+                  child: Text("Wifi")),
+            )
+          ],
+        ),
+        body:
+            //upavai
+            //     ? AlertDialog(
+            //         content: Text("yoooo"),
+            //       )
+            //     :
+            Page,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog(
+                  // Retrieve the text the that user has entered by using the
+                  // TextEditingController.
+                  content: MyForm(),
+                );
+              },
+            );
+          },
+          tooltip: 'Configure',
+          child: const Icon(Icons.settings),
+        ));
+  }
+}
+
+class Sis extends StatelessWidget {
+  // ignore: non_constant_identifier_names
+  String SiUs = " ";
+  // ignore: non_constant_identifier_names
+  String SiPpass = " ";
+  Sis({
+    super.key,
+  });
+
+  void getPre() async {
+    final prefs = await SharedPreferences.getInstance();
+    SiUs = prefs.getString("username").toString();
+    SiPpass = prefs.getString("Sipassword").toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    getPre();
+    return InAppWebView(
+      initialUrlRequest:
+          URLRequest(url: Uri.https('app.utu.ac.in', 'UTUSIS/SIS/Login.aspx')),
+      initialUserScripts: UnmodifiableListView<UserScript>([
+        UserScript(
+            source: "var foo = 49;",
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START),
+        UserScript(
+            source: "var bar = 2;",
+            injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END),
+      ]),
+      onLoadStop: (controller, url) async {
+        await controller.evaluateJavascript(source: '''
+     function getElementByXPath(xpath) {
+      return new XPathEvaluator()
+        .createExpression(xpath)
+        .evaluate(document, XPathResult.FIRST_ORDERED_NODE_TYPE)
+        .singleNodeValue
+    }
+    getElementByXPath('/html/body/form/div[3]/fieldset/p[1]/input').value = "$SiUs";
+    getElementByXPath('/html/body/form/div[3]/fieldset/p[2]/input').value = "$SiPpass";
+    getElementByXPath('/html/body/form/div[3]/fieldset/p[3]/input').click();
+    ''');
+        // 51
+      },
+    );
   }
 }
 
@@ -190,6 +356,7 @@ class _MyForm extends State<MyForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController username = TextEditingController();
   TextEditingController pass = TextEditingController();
+  TextEditingController sipass = TextEditingController();
   String Us = "";
   String Ppass = "";
   void getPre() async {
@@ -222,7 +389,19 @@ class _MyForm extends State<MyForm> {
           TextFormField(
             controller: pass,
             decoration: const InputDecoration(
-              hintText: 'Enter your password',
+              hintText: 'Enter your  wifi password',
+            ),
+            validator: (String? value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter some text';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: sipass,
+            decoration: const InputDecoration(
+              hintText: 'Enter your SIS password',
             ),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
@@ -238,10 +417,10 @@ class _MyForm extends State<MyForm> {
                 // Validate will return true if the form is valid, or false if
                 // the form is invalid.
                 if (_formKey.currentState!.validate()) {
-                  _save(context, username.text, pass.text);
+                  _save(context, username.text, pass.text, sipass.text);
                 }
               },
-              child: const Text('Submit'),
+              child: const Text('Save'),
             ),
           ),
           const Center(child: Text("Made By Kalp"))
@@ -250,10 +429,12 @@ class _MyForm extends State<MyForm> {
     );
   }
 
-  Future<void> _save(BuildContext context, String u, String p) async {
+  Future<void> _save(
+      BuildContext context, String u, String p, String sp) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("username", u);
     await prefs.setString("password", p);
+    await prefs.setString("Sipassword", sp);
     // ignore: use_build_context_synchronously
     Navigator.of(context, rootNavigator: true).pop('dialog');
   }

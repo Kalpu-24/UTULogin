@@ -1,9 +1,9 @@
 name: utulogin
-description: A new Flutter project.
+description: A Flutter project which lets you login to your utu wifi and sis login automatically.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.0.1+1
 
 environment:
   sdk: '>=2.19.4 <4.0.0'
@@ -21,6 +21,8 @@ dependencies:
   change_app_package_name: ^1.1.0
   version: ^3.0.2
   package_info_plus: ^3.1.2
+  http: ^0.13.6
+  html: ^0.15.3
 
 dev_dependencies:
   flutter_test:
