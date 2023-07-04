@@ -1,6 +1,6 @@
 # UTULogin
 
-## Version:- 1.0.1+1
+## Version:- 1.1.0+0
 
 This app lets you login to your utu wifi login portal automatically on app run.
 

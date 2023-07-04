@@ -3,7 +3,7 @@ description: A Flutter project which lets you login to your utu wifi and sis log
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.1+1
+version: 1.1.0+0
 
 environment:
   sdk: '>=2.19.4 <4.0.0'
