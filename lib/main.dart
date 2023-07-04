@@ -6,28 +6,69 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:version/version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:http/http.dart' as http;
+import 'package:flutter_shortcuts/flutter_shortcuts.dart';
 
 void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String action = 'No Action';
+  Widget shortpage = const MyHomePage();
+  final FlutterShortcuts flutterShortcuts = FlutterShortcuts();
+  @override
+  void initState() {
+    super.initState();
+    flutterShortcuts.initialize(debug: true);
+    flutterShortcuts.setShortcutItems(
+      shortcutItems: <ShortcutItem>[
+        const ShortcutItem(
+          id: "1",
+          action: '0',
+          shortLabel: 'Wifi',
+          icon: "ic_wifi",
+          shortcutIconAsset: ShortcutIconAsset.androidAsset,
+        ),
+        const ShortcutItem(
+          id: "2",
+          action: '1',
+          shortLabel: 'SIS',
+          icon: "ic_sis",
+          shortcutIconAsset: ShortcutIconAsset.androidAsset,
+        ),
+      ],
+    );
+    flutterShortcuts.listenAction((String incomingAction) {
+      setState(() {
+        if (incomingAction == "1") {
+          shortpage = const MyHomePage2();
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Utu Login',
         theme: ThemeData(
           useMaterial3: true,
           primarySwatch: Colors.blue,
         ),
-        home: const MyHomePage(),
+        home: shortpage,
       ),
     );
   }
@@ -85,7 +126,9 @@ Future<List<String>> extractData() async {
           .split(' ')[1]
           .split('+')[1];
 
-      print(responseString1);
+      if (kDebugMode) {
+        print(responseString1);
+      }
       return [responseString1.toString(), responseString2.toString()];
     } catch (e) {
       return ['', 'ERROR!'];
@@ -126,17 +169,19 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('UTU Login'),
+          automaticallyImplyLeading: false,
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: MaterialButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => MyHomePage2()),
+                      MaterialPageRoute(
+                          builder: (context) => const MyHomePage2()),
                     );
                   },
-                  child: Text("SIS")),
+                  child: const Text("SIS")),
             )
           ],
         ),
@@ -197,17 +242,19 @@ class MyHomePage2 extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('UTU Login'),
+          automaticallyImplyLeading: false,
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: MaterialButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                      MaterialPageRoute(
+                          builder: (context) => const MyHomePage()),
                     );
                   },
-                  child: Text("Wifi")),
+                  child: const Text("Wifi")),
             )
           ],
         ),
@@ -237,6 +284,7 @@ class MyHomePage2 extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class Sis extends StatelessWidget {
   // ignore: non_constant_identifier_names
   String SiUs = " ";
@@ -381,7 +429,7 @@ class _MyForm extends State<MyForm> {
             ),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter some text';
+                return 'Please enter your enrollment No.';
               }
               return null;
             },
@@ -393,7 +441,7 @@ class _MyForm extends State<MyForm> {
             ),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter some text';
+                return 'Please enter your wifi password';
               }
               return null;
             },
@@ -405,7 +453,7 @@ class _MyForm extends State<MyForm> {
             ),
             validator: (String? value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter some text';
+                return 'Please enter your SIS password';
               }
               return null;
             },
