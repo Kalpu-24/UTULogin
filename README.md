@@ -10,5 +10,5 @@ On first run enter your Enrollment Number and password for app to save the data 
 and restart the app and Voila!! it will work forever.
 
 
-https://github.com/Kalpu-24/UTULogin/assets/69300733/c9e258f9-30ce-475d-bc37-6ef527f4142d
+https://github.com/Kalpu-24/UTULogin/assets/69300733/9b5ed64b-f18d-4b6f-aea8-85383b411c92
 
